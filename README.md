@@ -150,7 +150,7 @@ When you run main.py, a graphical interface will appear which lets you input a s
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
 Some ideas of ways to extend this code include:
- - Add date from other Indonesian languages
+ - Add data from other Indonesian languages
  - Add other classification methods - eg Markov model
 
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
