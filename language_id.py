@@ -20,6 +20,7 @@ if len(adversarial_file) > 0:
 data=pd.read_csv(input_files[0])
 for file in input_files[1:]:
     data=pd.concat([data,pd.read_csv(file)])
+# filter for sentences with more than 3 words
 data = data[data["text"].str.split().str.len() > 3]
 input_data = []
 labels = []
@@ -276,4 +277,13 @@ results_incorrect = results_incorrect.rename(columns={0:"index",1:"language",2: 
 with_vals=results_df.sort_values([2])
 with_vals_approve = with_vals[((with_vals[2]>-900) & (with_vals[1]>25)) | (with_vals[1]>70)]
 with_vals_flag = with_vals[(with_vals[1]<25)| ((with_vals[2]<-900) & (with_vals[1]<70))]
+
+def decode(label_int):
+    prediction = [i for i in label_map if label_map[i] == label_int][0]
+    return prediction
+def process_input(input_text):
+    input_ngrams = create_n_grams(input_text, 3)
+    input_line_as_int = [mapping.get(input_token, 0) for input_token in input_ngrams]
+    prediction = decode(int(clf.predict([input_line_as_int])[0][0]))
+    return prediction
 

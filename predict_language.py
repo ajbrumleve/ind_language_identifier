@@ -1,71 +1,112 @@
+import pickle
+
 import pandas as pd
+import seaborn as sns
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import precision_score, recall_score, accuracy_score, confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.preprocessing import LabelEncoder
+import matplotlib.pyplot as plt
 import re
 
-print("Beginning to train language recognition model")
-# data=pd.read_csv("D:/C Downloads/archive (1)/Language Detection.csv")
 data_ind = pd.read_csv("static/Language Detection_ind.csv")
-# data_ind=pd.read_csv("D:/C Downloads/archive (1)/Language Detection_ind_with_fb.csv")
-# data=np.array_split(data, 2)[0]
-# data=pd.concat([data,data_ind])
+
 data = data_ind
-conv_table = pd.DataFrame(columns=["data_size", "accuracy", "f1"])
+
 ngram_files = {"Alas": 'static/Language Detection_btz.csv', "Indonesian": 'static/Language Detection_ind_only.csv',
                "English": 'static/Language Detection_eng.csv'}
-for iteration in range(10):
-    data = data_ind
-    size = round((iteration + 1) * len(data) / 10)
-    data = data.sample(n=size)
-    X = data["text"]
-    y = data["language"]
-
-    le = LabelEncoder()
-    y = le.fit_transform(y)
-
-    data_list = []
-    # iterating through all the text
-    for text in X:
-        # removing the symbols and numbers
-        text = re.sub(r'[!@#$(),n"%^*?:;~`0-9]', ' ', text)
-        text = re.sub(r'[[]]', ' ', text)
-        # converting the text to lower case
-        text = text.lower()
-        # appending to data_list
-        data_list.append(text)
-
-    cv = CountVectorizer()
-    X = cv.fit_transform(data_list).toarray()
-    X.shape  # (10337, 39419)
-
-    x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
-
-    model = MultinomialNB()
-    model.fit(x_train, y_train)
-
-    y_pred = model.predict(x_test)
-
-    pr = precision_score(y_test, y_pred, average=None)[0]
-    rc = recall_score(y_test, y_pred, average=None)[1]
-    ac = accuracy_score(y_test, y_pred)
-    cm = confusion_matrix(y_test, y_pred)
-    f1 = 2 * (pr * rc) / (pr + rc)
-    item = {"data_size": size, "accuracy": ac, "f1": f1}
-    item_df = pd.DataFrame(item, index=[iteration])
-    conv_table = conv_table.append(item_df)
-print("Finished training language recognition model. Accuracy is ", ac * 100, "%. Precision is ", pr, ". Recall is ",
-      rc, "f1 is ", f1, ".")
 
 
-# Accuracy is : 0.9772727272727273
+def save_model(model, file_out):
+    pickle.dump(model, open(file_out, 'wb'))
 
 
-# plt.figure(figsize=(15,10))
-# sns.heatmap(cm, annot=True)
-# plt.show()
+def build_model(show_conf_matrix=False):
+    print("Beginning to train language recognition model")
+    models = {}
+    accuracies = []
+    conv_table = pd.DataFrame(columns=["data_size", "accuracy", "f1"])
+    for iteration in range(10):
+        data = data_ind
+        size = round((iteration + 1) * len(data) / 10)
+        data = data.sample(n=size)
+        X = data["text"]
+        y = data["language"]
+
+        le = LabelEncoder()
+        y = le.fit_transform(y)
+
+        data_list = []
+        # iterating through all the text
+        for text in X:
+            # removing the symbols and numbers
+            text = re.sub(r'[!@#$(),n"%^*?:;~`0-9]', ' ', text)
+            text = re.sub(r'[[]]', ' ', text)
+            # converting the text to lower case
+            text = text.lower()
+            # appending to data_list
+            data_list.append(text)
+
+        cv = CountVectorizer()
+        X = cv.fit_transform(data_list).toarray()
+        X.shape  # (10337, 39419)
+
+        x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
+
+        model = MultinomialNB()
+        model.fit(x_train, y_train)
+
+        y_pred = model.predict(x_test)
+
+        pr = precision_score(y_test, y_pred, average=None)[0]
+        rc = recall_score(y_test, y_pred, average=None)[1]
+        ac = accuracy_score(y_test, y_pred)
+        cm = confusion_matrix(y_test, y_pred)
+        f1 = 2 * (pr * rc) / (pr + rc)
+        item = {"data_size": size, "accuracy": ac, "f1": f1}
+        item_df = pd.DataFrame(item, index=[iteration])
+        conv_table = conv_table.append(item_df)
+        models[iteration] = {}
+        models[iteration]["cv"] = cv
+        models[iteration]["model"] = model
+        models[iteration]["pr"] = pr
+        models[iteration]["ac"] = ac
+        models[iteration]["cm"] = cm
+        models[iteration]["f1"] = f1
+        models[iteration]["le"] = le
+        accuracies.append(ac)
+        print(
+            f"Finished training language recognition model iteration {iteration}. Accuracy is {ac * 100}%. Precision is {pr}. "
+            f"Recall is {rc}, f1 is {f1}.")
+
+    highest_accuracy_iteration = max(range(10), key=lambda i: accuracies[i])
+    model = models[highest_accuracy_iteration]["model"]
+    cv = models[highest_accuracy_iteration]["cv"]
+    pr = models[highest_accuracy_iteration]["pr"]
+    ac = models[highest_accuracy_iteration]["ac"]
+    f1 = models[highest_accuracy_iteration]["f1"]
+    cm = models[highest_accuracy_iteration]["cm"]
+    le = models[highest_accuracy_iteration]["le"]
+    # Accuracy is : 0.9772727272727273
+    print(
+        f"Iteration {highest_accuracy_iteration} chose. Accuracy is {ac * 100}%. Precision is {pr}. "
+        f"Recall is {rc}, f1 is {f1}.")
+
+    if show_conf_matrix:
+        plt.figure(figsize=(15, 10))
+        sns.heatmap(cm, annot=True)
+        plt.show()
+
+    print("Creating trigram lists")
+    ngram_lists = {}
+    for key in ngram_files.keys():
+        approved_trigrams = get_grams(key)
+        ngram_lists[key] = approved_trigrams
+    print("Trigram lists created")
+
+    save_model((model, cv, le, ngram_lists), "models/lang_id.mdl")
+    return model, cv, le, ngram_lists
 
 
 def create_n_grams(string, n, gram_list):
@@ -93,14 +134,6 @@ def get_grams(language):
     return new_approved_trigrams
 
 
-print("Creating trigram lists")
-ngram_lists = {}
-for key in ngram_files.keys():
-    approved_trigrams = get_grams(key)
-    ngram_lists[key] = approved_trigrams
-print("Trigram lists created")
-
-
 def familiarity(string, n, gram_list):
     list_grams_approved = gram_list
     num_not_approved = 0
@@ -115,12 +148,27 @@ def familiarity(string, n, gram_list):
 
 
 def predict(input_text):
+    try:
+        filename = "models/lang_id.mdl"
+        model, cv, le, ngram_lists = pickle.load(open(filename, 'rb'))
+    except:
+        new_model = build_model()
+        model, cv, le, ngram_lists = new_model
+
     x = cv.transform([input_text]).toarray()  # converting text to bag of words model (Vector)
     lang = model.predict(x)  # predicting the language
     lang_probs = model.predict_proba(x)
-    lang = le.inverse_transform(lang)  # finding the language corresponding the the predicted value
+    lang_prob_dict = {}
+    for i in range(len(le.classes_)):
+        lang_prob_dict[le.classes_[i]] = f"{round(lang_probs[0][i] * 100, 1)}%"
+    print(lang_prob_dict)
+    lang = le.inverse_transform(lang)  # finding the language corresponding the predicted value
     gram_list = ngram_lists[lang[0]]
-    if familiarity(input_text, 3, gram_list) > .75:
-        return lang[0]
+    input_familiarity = familiarity(input_text, 3, gram_list)
+    print(input_familiarity)
+    if input_familiarity > .75:
+        print(lang[0], input_familiarity, lang_prob_dict)
+        return lang[0], input_familiarity, lang_prob_dict
     else:
-        return "language_salah"
+        print("language not recognized. Please use Indonesian, Alas, or English","","")
+        return "unknown language",input_familiarity,lang_prob_dict
