@@ -1,4 +1,4 @@
-# ind_language_identifier
+# Indonesian Language Identifier
 <!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
 <a name="readme-top"></a>
 <!--
@@ -32,10 +32,10 @@
 <br />
 <div align="center">
 
-  <h3 align="center">Lyrics Generator</h3>
+  <h3 align="center">Indonesian Language Identifier</h3>
 
   <p align="center">
-    Generate lyrics in the style of your favorite artists
+    Identify the Indonesian language being used
     <br />
     <a href="https://github.com/ajbrumleve/ind_language_identifier/issues">Report Bug</a>
     ·
@@ -75,7 +75,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-This project started as an Udemy project in the course Data Science: Natural Language Processing (NLP) in Python by Lazy Programmer. The original project was to be able to generate poetry by Robert Frost using a second order Markov model. I adapted the project and implemented the Genius API to be able to enter any combination of artists and train a second order Markov model to generate lyrics in the style of those artists.
+This code is a piece of the quality control of the ikata app developed by Intek Solutions. The ikata app crowdsources language data collection in Indonesia. A need in the app was to be able to confirm the language being input into the app was the expected language. This code currently trains a Naive Bayes model on labelled Indonesian, English, and Alas sentences. Alas is a language spoken in Aceh Tenggara in Northern Sumatra. 
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -100,33 +100,35 @@ This project started as an Udemy project in the course Data Science: Natural Lan
 
 ### Prerequisites
 
-`lyricsgenius` requires Python 3.
+Require packages wxPython, numpy, pandas, scikit-learn, seaborn, and matpotlib.
 
-Use `pip` to install the package from PyPI:
-
-```bash
-pip install lyricsgenius
-```
-
-Or, install the latest version of the package from GitHub:
+Use `pip` to install the packages from PyPI:
 
 ```bash
-pip install git+https://github.com/johnwmillr/LyricsGenius.git
+pip install wxPython
+pip install numpy
+pip install pandas
+pip install scikit-learn
+pip install seaborn
+pip install matplotlib
 ```
 
 ### Installation
 
+1. Download and unzip [this entire repository from GitHub](https://github.com/ajbrumleve/ind_language_identifier), either interactively, or by entering the following in your Terminal.
+    ```bash
+    git clone https://github.com/ajbrumleve/ind_language_identifier.git
+    ```
+2. Navigate into the top directory of the repo on your machine
+    ```bash
+    cd ind_language_identifier
+    ```
+3. Create a virtualenv and install the package dependencies. If you don't have `pipenv`, you can follow instructions [here](https://pipenv.pypa.io/en/latest/install/) for how to install.
+    ```bash
+    pipenv install
+    ```
+4. Run `main.py` to run the graphical interface. 
 
-
-1. Before using this package you'll need to sign up for a (free) account that authorizes access to [the Genius API](http://genius.com/api-clients). The Genius account provides a `access_token` that is required by the package.
-2. Clone the repo
-   ```sh
-   git clone https://github.com/ajbrumleve/ind_language_identifier.git
-   ```
-3. Enter your API in `config.py`
-   ```python
-   GENIUS_TOKEN = 'ENTER YOUR API'
-   ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -135,7 +137,7 @@ pip install git+https://github.com/johnwmillr/LyricsGenius.git
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Right now, when you run main.py, you are asked for an artist's name. You can then add multiple other artists as well. Once the scrape is done, the .txt file with the artist's lyrics is found in the lyrics folder. Future runs won't have to scrape again. It is important when you enter an artists name that the spelling matches the file name if it exists in the lyrics folder. For example if the file 'lyrics/The Oh Hellos.txt' exists, the artist's name must be enetered as The Oh Hellos and not Oh Hellos. Once the scraping is done, you can choose how many lines of text to generate. 
+When you run main.py, a graphical interface will appear which lets you input a sentence. If a model has not been trianed before it will quickly train the model and save it. Future runs will not require this step. The output will give the most likely language, how closely the trigrams in the input text match the model for that language, and the probabilities for each language. If the input text is not sufficiently similar to the languages used in training, the model will output unknown. 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -146,6 +148,10 @@ Right now, when you run main.py, you are asked for an artist's name. You can the
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+Some ideas of ways to extend this code include:
+ - Add data from other Indonesian languages
+ - Add other classification methods - eg Markov model
 
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
 Don't forget to give the project a star! Thanks again!
@@ -183,8 +189,6 @@ Project Link: [https://github.com/ajbrumleve/ind_language_identifier](https://gi
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* [Data Science: Natural Language Processing (NLP) in Python](https://www.udemy.com/course/data-science-natural-language-processing-in-python/)
-* [lyricsgenius](https://github.com/johnwmillr/LyricsGenius)
 * [README Template](https://github.com/othneildrew/Best-README-Template)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
