@@ -121,7 +121,7 @@ pip install matplotlib
     ```
 2. Navigate into the top directory of the repo on your machine
     ```bash
-    cd house_price_prediction
+    cd ind_language_identifier
     ```
 3. Create a virtualenv and install the package dependencies. If you don't have `pipenv`, you can follow instructions [here](https://pipenv.pypa.io/en/latest/install/) for how to install.
     ```bash
