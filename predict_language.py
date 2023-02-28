@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.preprocessing import LabelEncoder
 import matplotlib.pyplot as plt
+from typing import List, Tuple, Dict
 import re
 
 data_ind = pd.read_csv("static/Language Detection_ind.csv")
@@ -18,7 +19,7 @@ ngram_files = {"Alas": 'static/Language Detection_btz.csv', "Indonesian": 'stati
                "English": 'static/Language Detection_eng.csv'}
 
 
-def save_model(model, file_out):
+def save_model(model: Tuple[MultinomialNB, CountVectorizer, LabelEncoder, Dict[str,List[str]]], file_out: str) -> None:
     pickle.dump(model, open(file_out, 'wb'))
 
 
