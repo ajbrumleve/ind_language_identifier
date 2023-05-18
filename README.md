@@ -77,6 +77,15 @@
 
 This code is a piece of the quality control of the ikata app developed by Intek Solutions. The ikata app crowdsources language data collection in Indonesia. A need in the app was to be able to confirm the language being input into the app was the expected language. This code currently trains a Naive Bayes model on labelled Indonesian, English, and Alas sentences. Alas is a language spoken in Aceh Tenggara in Northern Sumatra. 
 
+                   precision  recall    f1-score   support
+
+           0        0.99823   0.98727   0.99272     16030
+           1        0.99881   0.99987   0.99934     15999
+           2        0.98744   0.99725   0.99232     15999
+
+    accuracy                            0.99479     48028
+    macro avg       0.99483   0.99480   0.99480     48028
+    weighted avg    0.99483   0.99479   0.99479     48028
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
