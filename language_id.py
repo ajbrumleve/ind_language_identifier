@@ -43,7 +43,7 @@ else:
 for label, f in enumerate(input_files):
   print(f"{f} corresponds to label {label}")
 
-  for line in open(f):
+  for line in open(f,errors="replace"):
     line = line.rstrip().lower()
     if line:
       # remove punctuation
