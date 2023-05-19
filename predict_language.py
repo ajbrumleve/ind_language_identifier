@@ -1,19 +1,17 @@
 import pickle
+import re
+from typing import List, Tuple, Dict
 
-import chardet
+import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from sklearn.decomposition import PCA
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics import precision_score, recall_score, accuracy_score, confusion_matrix, classification_report
+from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.model_selection import train_test_split, KFold, cross_val_score, cross_val_predict, GridSearchCV
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.preprocessing import LabelEncoder
-import matplotlib.pyplot as plt
-from typing import List, Tuple, Dict
-import re
-from utils import get_predict_language_report
 
+from utils import get_predict_language_report
 
 data_ind = pd.read_csv("static/Language Detection_ind.csv", encoding_errors="replace", delimiter="\t")
 

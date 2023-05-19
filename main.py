@@ -1,8 +1,10 @@
 import wx
+
 import predict_language
+
 try:
     import language_id
-except:
+except MemoryError:
     pass
 
 
@@ -31,7 +33,7 @@ class MainPanel(wx.Panel):
         prediction, familiarity, prob_dict = predict_language.predict(input_text)
         try:
             markov_prediction = language_id.process_input(input_text)
-        except:
+        except NameError:
             markov_prediction = "Markov memory error"
         self.result_txt.SetValue(f"{prediction} - Input text matches most likely language profile {familiarity * 100}%"
                                  f"\n\nThe probabilities for each language are: {prob_dict}\n\nThe Markov model "

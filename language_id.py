@@ -1,4 +1,3 @@
-import math
 import string
 
 import numpy as np
@@ -25,7 +24,7 @@ data = data[data["text"].str.split().str.len() > 3]
 input_data = []
 labels = []
 
-if ADVERSARIAL == True:
+if ADVERSARIAL:
     adversarial_data = pd.read_csv('static/Language Detection_eng.csv')
     adversarial_input_data = adversarial_data["text"].reset_index(drop=True)
     adversarial_labels = adversarial_data["language"].reset_index(drop=True)
@@ -70,31 +69,30 @@ y_test = y_test.append(adversarial_y_test)
 def split_sentence(list_sentences):
     data2=[]
     #loop through data and split each line
-    for i in range(len(list_sentences)):
-        list_sentences[i]=input_data[i]
-        data2.append(list_sentences[i].split())
-        data2.append(list_sentences[i].split())
+    for j in range(len(list_sentences)):
+        list_sentences[j]=input_data[j]
+        data2.append(list_sentences[j].split())
+        data2.append(list_sentences[j].split())
     return data2
 
-def create_n_grams(string, n):
+def create_n_grams(input_string, n):
     list_grams = []
-    word_len = len(string)
-    for i in range(word_len - n + 1):
-        gram = string[i:i + n]
+    word_len = len(input_string)
+    for j in range(word_len - n + 1):
+        gram = input_string[j:j + n]
         list_grams.append(gram)
-    list_grams.append(string[(word_len-n+1):(word_len+1+n)])
+    list_grams.append(input_string[(word_len - n + 1):(word_len + 1 + n)])
     return list_grams
 
 def create_n_grams_from_list(list_of_strings, n):
     gram_list = []
-    for item in list_of_strings:
-        gram_list = create_n_grams(item, n, gram_list)
+    for string_element in list_of_strings:
+        gram_list = create_n_grams(string_element, n, gram_list)
     return gram_list
 
     #assign each uniqe word an integer
 int_index = 1
-mapping = {}
-mapping["<unk>"] = 0
+mapping = {"<unk>": 0}
 for text in X_train:
     # tokens = text.split()
     tokens= create_n_grams(text,3)
@@ -137,16 +135,16 @@ A2 = np.ones((V, V))
 pi2 = np.ones(V)
 
 # compute counts for A and pi
-def compute_counts(text_as_int, A, pi):
-    for tokens in text_as_int:
+def compute_counts(text_as_int, a, pi_compute):
+    for tokens_compute in text_as_int:
         last_idx = None
-        for idx in tokens:
+        for idx in tokens_compute:
             if last_idx is None:
                 # it's the first word in a sentence
-                pi[idx] += 1
+                pi_compute[idx] += 1
             else:
                 # the last word exists, so count a transition
-                A[last_idx, idx] += 1
+                a[last_idx, idx] += 1
             # update last idx
             last_idx = idx
 total = len(y_train)

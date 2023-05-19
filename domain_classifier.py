@@ -1,16 +1,15 @@
-import pandas as pd
 import re
 
+import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.model_selection import KFold, cross_val_score, cross_val_predict, train_test_split, GridSearchCV
+from sklearn.metrics import confusion_matrix
+from sklearn.model_selection import KFold, cross_val_score, cross_val_predict
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.preprocessing import LabelEncoder
-from logger import *
-from utils import get_domain_class_report
 
+from utils import get_domain_class_report
 
 data = pd.read_csv("D:/C Downloads/indo_alas_class.csv", encoding_errors="replace")
 X = data["Alas"]
