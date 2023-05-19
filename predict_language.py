@@ -6,12 +6,14 @@ import seaborn as sns
 from sklearn.decomposition import PCA
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import precision_score, recall_score, accuracy_score, confusion_matrix, classification_report
-from sklearn.model_selection import train_test_split, KFold, cross_val_score, cross_val_predict
+from sklearn.model_selection import train_test_split, KFold, cross_val_score, cross_val_predict, GridSearchCV
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.preprocessing import LabelEncoder
 import matplotlib.pyplot as plt
 from typing import List, Tuple, Dict
 import re
+from utils import get_predict_language_report
+
 
 data_ind = pd.read_csv("static/Language Detection_ind.csv", encoding_errors="replace", delimiter="\t")
 
@@ -58,13 +60,13 @@ def build_model(show_conf_matrix=False):
 
     # x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
 
-    model = MultinomialNB()
+    model = MultinomialNB(alpha=.01)
 
     # Define the number of folds for cross-validation
     n_folds = 5
 
     # Define the cross-validation strategy
-    kf = KFold(n_splits=n_folds, shuffle=True, random_state=42)
+    kf = KFold(n_splits=n_folds, shuffle=True)
 
     # Perform cross-validation and calculate mean scores
     precision_scores = cross_val_score(model, X, y, cv=kf, scoring='precision_macro')
@@ -203,3 +205,26 @@ def predict(input_text):
     else:
         print("language not recognized. Please use Indonesian, Alas, or English","","")
         return "unknown language",input_familiarity,lang_prob_dict
+
+def fine_tune(X,y):
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Define the parameter grid
+    param_grid = {'alpha': [0, .001, .01, .05, 0.1, 0.2, 0.3, 0.5, 1.0]}
+
+    # Create an instance of the MNB model
+    mnb = MultinomialNB()
+
+    # Perform a grid search
+    grid_search = GridSearchCV(mnb, param_grid, cv=5)
+    grid_search.fit(X_train, y_train)
+
+    # Get the best model
+    best_model = grid_search.best_estimator_
+    print(grid_search.best_params_)
+
+    # Evaluate the best model on the validation set
+    y_pred = best_model.predict(X_val)
+    get_predict_language_report(y_val, y_pred)
+
+    return
